@@ -9,22 +9,22 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-  name = 'markdown-include',
+  name = 'markdown-swiss',
   packages = find_packages(),
-  version = '0.5.1',
-  description = 'This is an extension to Python-Markdown which provides an "include" function, similar to that found in LaTeX (and also the C pre-processor and Fortran). I originally wrote it for my FORD Fortran auto-documentation generator.',
+  version = '0.0.1',
+  description = 'This is an extension to Python-Markdown which provides a variety of functions for running python code',
   long_description = long_description,
-  author = 'Chris MacMackin',
-  author_email = 'cmacmackin@gmail.com',
-  url = 'https://github.com/cmacmackin/markdown-include/', 
-  download_url = 'https://github.com/cmacmackin/markdown-include/tarball/v0.5.1',
+  author = 'Chris Jefferson',
+  author_email = 'chriss@bubblescope.net',
+  url = 'https://github.com/ChrisJefferson/markdown-swiss', 
+  download_url = 'https://github.com/cmacmackin/markdown-swiss/tarball/v0.0.1',
   keywords = ['Markdown', 'typesetting', 'include', 'plugin', 'extension'],
   classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
@@ -41,9 +41,6 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
     ],
   install_requires = ['markdown']
 )

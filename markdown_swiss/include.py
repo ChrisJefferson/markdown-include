@@ -28,8 +28,9 @@ import os.path
 from codecs import open
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
+import importlib
 
-INC_SYNTAX = re.compile(r'\{!\s*(.+?)\s*!\}')
+INC_SYNTAX = re.compile(r'\{!([A-Z])\s*(.+?)\s*!\}')
 
 
 class MarkdownInclude(Extension):
@@ -48,8 +49,31 @@ class MarkdownInclude(Extension):
             'include', IncludePreprocessor(md,self.getConfigs()),'_begin'
         )
 
-
 class IncludePreprocessor(Preprocessor):
+    def funcF(self, m):
+        filename = m.group(2)
+        if not os.path.isabs(filename):
+            filename = os.path.normpath(
+                os.path.join(self.base_path,filename)
+            )
+        try:
+            with open(filename, 'r', encoding=self.encoding) as r:
+                text = r.readlines()
+        except Exception as e:
+            print('Warning: could not find file {}. Ignoring '
+                'include statement. Error: {}'.format(filename, e))
+            return ""
+        return text
+
+    def funcE(self, m):
+        code = m.group(2)
+        return eval(code)
+
+    def funcI(self, m):
+        lib = m.group(2)
+        importlib.import_module(lib)
+        return ""
+
     '''
     This provides an "include" function for Markdown, similar to that found in
     LaTeX (also the C pre-processor and Fortran). The syntax is {!filename!},
@@ -62,6 +86,11 @@ class IncludePreprocessor(Preprocessor):
         super(IncludePreprocessor, self).__init__(md)
         self.base_path = config['base_path']
         self.encoding = config['encoding']
+        self.options = {
+            'F' : self.funcF
+            'E' : self.funcX
+            'I' : self.funcI
+        }
 
     def run(self, lines):
         done = False
@@ -71,28 +100,12 @@ class IncludePreprocessor(Preprocessor):
                 m = INC_SYNTAX.search(line)
 
                 if m:
-                    filename = m.group(1)
-                    filename = os.path.expanduser(filename)
-                    if not os.path.isabs(filename):
-                        filename = os.path.normpath(
-                            os.path.join(self.base_path,filename)
-                        )
-                    try:
-                        with open(filename, 'r', encoding=self.encoding) as r:
-                            text = r.readlines()
-                    except Exception as e:
-                        print('Warning: could not find file {}. Ignoring '
-                            'include statement. Error: {}'.format(filename, e))
-                        lines[loc] = INC_SYNTAX.sub('',line)
-                        break
-
-                    line_split = INC_SYNTAX.split(line)
-                    if len(text) == 0:
-                        text.append('')
-                    for i in range(len(text)):
-                        text[i] = text[i].rstrip('\r\n')
+                    command = m.group(1)
+                    text = self.options[command](m)
+                    line_split = INC_SYNTAX.split(lines[loc], maxsplit = 1)
+                    if len(text) == 0: text.append('')
                     text[0] = line_split[0] + text[0]
-                    text[-1] = text[-1] + line_split[2]
+                    text[-1] = text[-1] + line_split[1]
                     lines = lines[:loc] + text + lines[loc+1:]
                     break
             else:
