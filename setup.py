@@ -15,7 +15,7 @@ setup(
   description = 'This is an extension to Python-Markdown which provides a variety of functions for running python code',
   long_description = long_description,
   author = 'Chris Jefferson',
-  author_email = 'chriss@bubblescope.net',
+  author_email = 'chris@bubblescope.net',
   url = 'https://github.com/ChrisJefferson/markdown-swiss', 
   download_url = 'https://github.com/cmacmackin/markdown-swiss/tarball/v0.0.1',
   keywords = ['Markdown', 'typesetting', 'include', 'plugin', 'extension'],

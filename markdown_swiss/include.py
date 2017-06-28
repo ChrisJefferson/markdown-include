@@ -33,7 +33,7 @@ import importlib
 INC_SYNTAX = re.compile(r'\{!([A-Z])\s*(.+?)\s*!\}')
 
 
-class MarkdownInclude(Extension):
+class MarkdownSwiss(Extension):
     def __init__(self, configs={}):
         self.config = {
             'base_path': ['.', 'Default location from which to evaluate ' \
@@ -74,6 +74,10 @@ class IncludePreprocessor(Preprocessor):
         importlib.import_module(lib)
         return ""
 
+    def funcX(self, m):
+        code = m.group(2)
+        exec(code)
+
     '''
     This provides an "include" function for Markdown, similar to that found in
     LaTeX (also the C pre-processor and Fortran). The syntax is {!filename!},
@@ -87,8 +91,8 @@ class IncludePreprocessor(Preprocessor):
         self.base_path = config['base_path']
         self.encoding = config['encoding']
         self.options = {
-            'F' : self.funcF
-            'E' : self.funcX
+            'F' : self.funcF,
+            'E' : self.funcX,
             'I' : self.funcI
         }
 
@@ -114,4 +118,4 @@ class IncludePreprocessor(Preprocessor):
 
 
 def makeExtension(*args,**kwargs):
-    return MarkdownInclude(kwargs)
+    return MarkdownSwiss(kwargs)
