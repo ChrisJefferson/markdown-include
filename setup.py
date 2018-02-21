@@ -17,7 +17,7 @@ setup(
   author = 'Chris Jefferson',
   author_email = 'chris@bubblescope.net',
   url = 'https://github.com/ChrisJefferson/markdown-swiss', 
-  download_url = 'https://github.com/cmacmackin/markdown-swiss/tarball/v0.0.1',
+  download_url = 'https://github.com/ChrisJefferson/markdown-swiss/tarball/v0.0.1',
   keywords = ['Markdown', 'typesetting', 'include', 'plugin', 'extension'],
   classifiers=[
         # How mature is this project? Common values are
