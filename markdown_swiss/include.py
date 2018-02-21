@@ -3,7 +3,9 @@
 #
 #  include.py
 #
-#  Copyright 2015 Christopher MacMackin <cmacmackin@gmail.com>
+#  Based on code Copyright 2015 Christopher MacMackin <cmacmackin@gmail.com>
+#
+#  Copyright 2018 Christopher Jefferson <chris@bubblescope.net>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,6 +24,7 @@
 #
 #
 
+
 from __future__ import print_function
 import re
 import os.path
@@ -29,6 +32,7 @@ from codecs import open
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 import importlib
+from six import string_types
 
 INC_SYNTAX = re.compile(r'\{!([A-Z])\s*(.+?)\s*!\}')
 
@@ -58,7 +62,7 @@ class IncludePreprocessor(Preprocessor):
             )
         try:
             with open(filename, 'r', encoding=self.encoding) as r:
-                text = r.readlines()
+                text = [x.rstrip() for x in r.readlines()]
         except Exception as e:
             print('Warning: could not find file {}. Ignoring '
                 'include statement. Error: {}'.format(filename, e))
@@ -71,12 +75,13 @@ class IncludePreprocessor(Preprocessor):
 
     def funcI(self, m):
         lib = m.group(2)
-        importlib.import_module(lib)
+        globals()[lib] = importlib.import_module(lib)
         return ""
 
     def funcX(self, m):
         code = m.group(2)
         exec(code)
+        return ""
 
     '''
     This provides an "include" function for Markdown, similar to that found in
@@ -92,7 +97,7 @@ class IncludePreprocessor(Preprocessor):
         self.encoding = config['encoding']
         self.options = {
             'F' : self.funcF,
-            'E' : self.funcX,
+            'E' : self.funcE,
             'I' : self.funcI
         }
 
@@ -106,10 +111,12 @@ class IncludePreprocessor(Preprocessor):
                 if m:
                     command = m.group(1)
                     text = self.options[command](m)
+                    if isinstance(text, string_types):
+                        text = [text]
                     line_split = INC_SYNTAX.split(lines[loc], maxsplit = 1)
                     if len(text) == 0: text.append('')
                     text[0] = line_split[0] + text[0]
-                    text[-1] = text[-1] + line_split[1]
+                    text[-1] = text[-1] + line_split[-1]
                     lines = lines[:loc] + text + lines[loc+1:]
                     break
             else:
